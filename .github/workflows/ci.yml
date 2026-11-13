@@ -1,0 +1,33 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  core:
+    name: Core tests
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Core tests
+        working-directory: Core
+        run: swift test
+
+  app:
+    name: App build
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate the project
+        run: xcodegen
+      - name: Build the app
+        run: xcodebuild -project Compass.xcodeproj -scheme "Compass Sandbox" -derivedDataPath build/ci build CODE_SIGNING_ALLOWED=NO
+
+  format:
+    name: Format
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check formatting
+        run: xcrun swift-format lint --strict --recursive App Core Bridge DockTile scripts

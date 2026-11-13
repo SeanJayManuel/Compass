@@ -1,0 +1,21 @@
+{
+  "errlist": [],
+  "connections": [
+    { "conn_id": "CON-1", "name": "Example Bank", "org_id": "ORG-1", "sfin_url": "https://bridge.example/simplefin" }
+  ],
+  "accounts": [
+    {
+      "id": "ACT-checking",
+      "name": "Everyday Checking",
+      "conn_id": "CON-1",
+      "currency": "USD",
+      "balance": "1234.56",
+      "balance-date": 1792900800,
+      "transactions": [
+        { "id": "TRN-1", "posted": 1792800000, "amount": "-6.50", "description": "BLUE BOTTLE #12", "payee": "Blue Bottle" },
+        { "id": "TRN-2", "posted": 1792700000, "amount": "5000.00", "description": "ACME PAYROLL" },
+        { "id": "TRN-3", "posted": 0, "amount": "-20.00", "description": "PENDING THING", "pending": true }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "errlist": [
+    { "code": "con.auth", "msg": "Example Credit Union needs you to sign in again.", "conn_id": "CON-2" }
+  ],
+  "connections": [
+    { "conn_id": "CON-1", "name": "Example Bank", "org_id": "ORG-1", "sfin_url": "https://bridge.example/simplefin" },
+    { "conn_id": "CON-2", "name": "Example Credit Union", "org_id": "ORG-2", "sfin_url": "https://bridge.example/simplefin" }
+  ],
+  "accounts": [
+    {
+      "id": "ACT-checking",
+      "name": "Everyday Checking",
+      "conn_id": "CON-1",
+      "currency": "USD",
+      "balance": "1234.56",
+      "available-balance": "1200.00",
+      "balance-date": 1792900800
+    },
+    {
+      "id": "ACT-card",
+      "name": "Rewards Card",
+      "conn_id": "CON-2",
+      "currency": "USD",
+      "balance": "-321.09",
+      "balance-date": 1792900800
+    }
+  ]
+}

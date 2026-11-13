@@ -1,0 +1,118 @@
+# Generate Compass.xcodeproj with `xcodegen`. The .xcodeproj is not committed.
+name: Compass
+options:
+  bundleIdPrefix: com.seanjaymanuel
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+packages:
+  Core:
+    path: Core
+targets:
+  Compass:
+    type: application
+    platform: macOS
+    configFiles: &signing
+      Debug: Config/Signing.xcconfig
+      Release: Config/Signing.xcconfig
+    sources:
+      - path: App
+        excludes: [Info.plist]
+    dependencies:
+      - package: Core
+      # Keeps the chosen icon in the Dock after Compass quits.
+      - target: CompassDockTile
+        embed: true
+        copy:
+          destination: plugins
+      # The bridge Claude desktop launches, in Contents/MacOS.
+      - target: compass-mcp
+        embed: true
+        copy:
+          destination: executables
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.seanjaymanuel.Compass
+        PRODUCT_NAME: Compass
+        # App Sandbox: network client, a loopback server for Claude,
+        # user-selected files, and Calendar and Reminders (EventKit's
+        # calendars key covers both).
+        CODE_SIGN_ENTITLEMENTS: App/Compass.entitlements
+        ENABLE_HARDENED_RUNTIME: YES
+        GENERATE_INFOPLIST_FILE: YES
+        # Merged with the generated keys: NSDockTilePlugIn has no build setting.
+        INFOPLIST_FILE: App/Info.plist
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        INFOPLIST_KEY_CFBundleDisplayName: Compass
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.finance
+        INFOPLIST_KEY_NSHumanReadableCopyright: "© 2026 Sean Manuel"
+        INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription: "Compass reads your calendars to show the rest of this week's events. It doesn't keep or send them anywhere."
+        INFOPLIST_KEY_NSRemindersFullAccessUsageDescription: "Compass reads your reminders to show what's due this week, and marks them done when you tick them off. It doesn't keep or send them anywhere."
+        MARKETING_VERSION: "0.1"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "6.0"
+        SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+        SWIFT_APPROACHABLE_CONCURRENCY: YES
+      # Development builds are a separate app ("Compass Dev", its own bundle ID),
+      # so they can never open the real app's data, even without --sandbox.
+      configs:
+        Debug:
+          PRODUCT_BUNDLE_IDENTIFIER: com.seanjaymanuel.Compass.dev
+          PRODUCT_NAME: Compass Dev
+          INFOPLIST_KEY_CFBundleDisplayName: Compass Dev
+          # Same sandbox, plus /private/tmp for debug tools like --snapshots.
+          CODE_SIGN_ENTITLEMENTS: App/CompassDebug.entitlements
+  CompassDockTile:
+    type: bundle
+    platform: macOS
+    configFiles: *signing
+    sources:
+      - DockTile
+      - App/Design/IconArt.swift
+      - App/Design/Theme.swift
+      - App/Design/DockTileShare.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.seanjaymanuel.Compass.docktile
+        PRODUCT_NAME: CompassDockTile
+        WRAPPER_EXTENSION: docktileplugin
+        INFOPLIST_FILE: DockTile/Info.plist
+        ENABLE_HARDENED_RUNTIME: YES
+        SKIP_INSTALL: YES
+        SWIFT_VERSION: "6.0"
+        MARKETING_VERSION: "0.1"
+        CURRENT_PROJECT_VERSION: "1"
+      configs:
+        Debug:
+          PRODUCT_BUNDLE_IDENTIFIER: com.seanjaymanuel.Compass.dev.docktile
+  # Not sandboxed: Claude desktop launches it directly, and it only talks to
+  # Compass on 127.0.0.1.
+  compass-mcp:
+    type: tool
+    platform: macOS
+    configFiles: *signing
+    sources:
+      - Bridge
+    settings:
+      base:
+        PRODUCT_NAME: compass-mcp
+        PRODUCT_BUNDLE_IDENTIFIER: com.seanjaymanuel.Compass.mcp
+        ENABLE_HARDENED_RUNTIME: YES
+        SKIP_INSTALL: YES
+        SWIFT_VERSION: "6.0"
+schemes:
+  Compass:
+    build:
+      targets:
+        Compass: all
+    run:
+      config: Debug
+  Compass Sandbox:
+    build:
+      targets:
+        Compass: all
+    run:
+      config: Debug
+      commandLineArguments:
+        "--sandbox": true

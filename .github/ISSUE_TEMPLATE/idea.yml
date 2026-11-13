@@ -1,0 +1,25 @@
+name: Idea
+description: Suggest a change or a new feature.
+labels: [idea]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What's hard or missing today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you'd change
+    validations:
+      required: true
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope
+      description: Compass is one user, US dollars, local data and macOS only (see CONTRIBUTING.md).
+      options:
+        - label: This fits that scope.
+          required: true
